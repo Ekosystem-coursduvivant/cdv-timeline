@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Formation Facilitateur·rice – Cours du vivant</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap');
+
+  :root {
+    --terre:    #7a5c3a;
+    --sable:    #c8a97a;
+    --ecru:     #f5f0e8;
+    --mousse:   #6b7c5c;
+    --ciel:     #6a8fa8;
+    --brique:   #c4714a;
+    --ardoise:  #4a5568;
+    --blanc:    #fdfaf5;
+
+    /* catégories */
+    --c-formation: #c4714a;
+    --c-visio:     #6a8fa8;
+    --c-tps:       #c8a97a;
+    --c-relecture: #5a7a9a;
+    --c-projet:    #6b7c5c;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--blanc);
+    color: var(--ardoise);
+    padding: 2rem;
+    min-width: 900px;
+  }
+
+  /* ── HEADER ───────────────────────────────────────── */
+  .header {
+    display: flex;
+    align-items: baseline;
+    gap: 1.2rem;
+    margin-bottom: 2rem;
+  }
+  .header h1 {
+    font-family: 'Lora', serif;
+    font-size: 1.4rem;
+    color: var(--terre);
+    font-weight: 600;
+  }
+  .header p {
+    font-size: 0.8rem;
+    color: var(--sable);
+    font-style: italic;
+  }
+
+  /* ── LÉGENDE ──────────────────────────────────────── */
+  .legende {
+    display: flex;
+    gap: 1.4rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.6rem;
+    padding-left: 4px;
+  }
+  .legende-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.72rem;
+    color: var(--ardoise);
+  }
+  .legende-dot {
+    width: 10px; height: 10px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  /* ── FRISE WRAPPER ────────────────────────────────── */
+  .frise-wrapper {
+    position: relative;
+    overflow-x: auto;
+  }
+  .frise-inner {
+    position: relative;
+    min-width: 860px;
+  }
+
+  /* ── LABELS "Votre projet / La formation" ─────────── */
+  .row-labels {
+    display: flex;
+    margin-bottom: 2px;
+  }
+  .row-label-spacer { width: 120px; flex-shrink: 0; }
+  .row-label-tracks {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .row-label {
+    font-family: 'Lora', serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--terre);
+    height: 22px;
+    display: flex;
+    align-items: center;
+  }
+
+  /* ── GRILLE MOIS ──────────────────────────────────── */
+  .grille {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+  }
+  .grille-spacer { width: 120px; flex-shrink: 0; }
+  .grille-cols {
+    flex: 1;
+    position: relative;
+  }
+
+  /* Fond mois alternés */
+  .month-bg {
+    position: absolute;
+    top: 0; bottom: 0;
+    background: rgba(200,169,122,0.07);
+    pointer-events: none;
+  }
+
+  /* Ligne axe */
+  .axe-container {
+    position: relative;
+    height: 32px;
+    display: flex;
+    align-items: center;
+  }
+  .axe-line {
+    position: absolute;
+    left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--terre), var(--sable));
+    border-radius: 2px;
+  }
+  .axe-arrow {
+    position: absolute;
+    right: -8px;
+    width: 0; height: 0;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-left: 10px solid var(--sable);
+  }
+
+  /* Séparateurs d'années */
+  .year-sep {
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 1px;
+    background: rgba(122,92,58,0.25);
+    pointer-events: none;
+  }
+  .year-label {
+    position: absolute;
+    top: 6px;
+    transform: translateX(-50%);
+    font-family: 'Lora', serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--terre);
+    background: var(--blanc);
+    padding: 0 4px;
+  }
+
+  /* Ticks + labels mois */
+  .month-tick {
+    position: absolute;
+    bottom: 0;
+    width: 1px;
+    height: 6px;
+    background: var(--sable);
+    transform: translateX(-50%);
+  }
+  .month-label {
+    position: absolute;
+    bottom: -18px;
+    transform: translateX(-50%);
+    font-size: 0.65rem;
+    color: var(--ardoise);
+    white-space: nowrap;
+  }
+
+  /* ── TRACKS (barres colorées) ─────────────────────── */
+  .tracks-area {
+    position: relative;
+    height: 52px; /* deux pistes */
+  }
+  .track-segment {
+    position: absolute;
+    height: 14px;
+    border-radius: 3px;
+    opacity: 0.88;
+    transition: opacity .2s;
+  }
+  .track-segment:hover { opacity: 1; }
+
+  /* track 0 = "Votre projet", track 1 = "La formation" */
+  .track-0 { top: 2px; }
+  .track-1 { top: 22px; }
+
+  /* ── ÉVÉNEMENTS (pastilles + labels) ─────────────── */
+  .events-area {
+    position: relative;
+    height: 100px;
+  }
+  .event-dot {
+    position: absolute;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    transform: translateX(-50%);
+    bottom: 0;
+    cursor: default;
+  }
+  .event-line {
+    position: absolute;
+    width: 1px;
+    background: currentColor;
+    opacity: 0.4;
+    bottom: 8px;
+    transform: translateX(-50%);
+  }
+  .event-label {
+    position: absolute;
+    font-size: 0.62rem;
+    line-height: 1.25;
+    text-align: center;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    color: var(--ardoise);
+    max-width: 90px;
+    white-space: normal;
+    text-align: center;
+  }
+
+  /* ── CHARGE MENSUELLE ─────────────────────────────── */
+  .charge-area {
+    margin-top: 10px;
+    position: relative;
+  }
+  .charge-label-col {
+    font-size: 0.62rem;
+    color: #888;
+    font-style: italic;
+    line-height: 1.3;
+    width: 120px;
+    flex-shrink: 0;
+    padding-right: 8px;
+  }
+  .charge-row {
+    display: flex;
+    align-items: center;
+  }
+  .charge-cells {
+    flex: 1;
+    position: relative;
+    height: 22px;
+  }
+  .charge-cell {
+    position: absolute;
+    transform: translateX(-50%);
+    font-size: 0.68rem;
+    color: var(--terre);
+    font-weight: 500;
+    top: 2px;
+  }
+
+  /* ── ENCART DÉTAIL ────────────────────────────────── */
+  .detail {
+    margin-top: 2.4rem;
+    background: #f0ebe0;
+    border-radius: 8px;
+    padding: 1.4rem 1.8rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.3rem 2rem;
+  }
+  .detail-item {
+    font-size: 0.75rem;
+    line-height: 1.6;
+    color: var(--ardoise);
+    display: flex;
+    gap: 0.4rem;
+    align-items: baseline;
+  }
+  .detail-bullet {
+    color: var(--sable);
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+  .detail-note {
+    grid-column: 1 / -1;
+    margin-top: 0.8rem;
+    font-size: 0.65rem;
+    font-style: italic;
+    color: #999;
+    line-height: 1.5;
+  }
+
+  /* ── TITRE BAS DE PAGE ────────────────────────────── */
+  .footer-title {
+    margin-top: 1.8rem;
+    font-family: 'Lora', serif;
+    font-size: 1rem;
+    color: var(--terre);
+    border-top: 1px solid var(--sable);
+    padding-top: 1rem;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════
+     DONNÉES — modifier ici pour tout recalculer
+     Mois indexés depuis juillet 2026 = 0
+     Chaque unité = 1 mois
+     ════════════════════════════════════════════════════ -->
+<script>
+// ── CONFIGURATION ─────────────────────────────────────
+const START = { year: 2026, month: 6 }; // juillet 2026 (month = 0-based JS)
+const N_MONTHS = 18; // juil 2026 → déc 2027
+
+// Segments colorés sur la frise
+// track: 0 = "Votre projet", 1 = "La formation"
+// start/end en index mois depuis START (0 = juil 2026)
+const SEGMENTS = [
+  // ── Votre projet (track 0) ──
+  { track: 0, type: "formation", start: 0,   end: 1.5 },   // juil–mi août
+  { track: 0, type: "projet",    start: 2,   end: 4   },   // sept–oct
+  { track: 0, type: "projet",    start: 4,   end: 5.5 },   // nov–mi déc
+  { track: 0, type: "relecture", start: 5.5, end: 6   },
+  { track: 0, type: "projet",    start: 6,   end: 8   },   // janv–fév
+  { track: 0, type: "tps",       start: 8,   end: 9   },   // mars
+  { track: 0, type: "projet",    start: 12,  end: 15  },   // juil–sept
+  { track: 0, type: "projet",    start: 16,  end: 17  },   // nov
+
+  // ── La formation (track 1) ──
+  { track: 1, type: "formation", start: 0,   end: 1   },   // juil (formation initiale)
+  { track: 1, type: "visio",     start: 2,   end: 2.5 },   // début sept
+  { track: 1, type: "tps",       start: 3.5, end: 4   },   // mi-oct
+  { track: 1, type: "tps",       start: 4.5, end: 5   },   // mi-nov
+  { track: 1, type: "relecture", start: 5,   end: 5.5 },   // mi-déc
+  { track: 1, type: "visio",     start: 6,   end: 6.5 },   // début janv
+  { track: 1, type: "tps",       start: 6.5, end: 7   },   // mi-janv
+  { track: 1, type: "relecture", start: 6.5, end: 7   },
+  { track: 1, type: "tps",       start: 8,   end: 9   },   // mars
+  { track: 1, type: "visio",     start: 11,  end: 11.5},   // juin
+  { track: 1, type: "tps",       start: 15,  end: 15.5},   // oct
+];
+
+// Événements ponctuels (label au-dessus de la frise)
+// pos = index mois (décimaux ok), row = 0 (haut) ou 1 (bas) pour alterner
+const EVENTS = [
+  { pos: 2,    label: "rêve",               row: 1 },
+  { pos: 3,    label: "questionnaires\nanalyse", row: 0 },
+  { pos: 4.5,  label: "présentation",       row: 1 },
+  { pos: 5,    label: "conception",         row: 0 },
+  { pos: 6,    label: "consignes de\npréparation\n1er chantier", row: 1 },
+  { pos: 6.5,  label: "préparation\ndu chantier", row: 0 },
+  { pos: 8,    label: "1er chantier\nparticipatif", row: 1 },
+  { pos: 12,   label: "consignes\n2nd chantier", row: 0 },
+  { pos: 15,   label: "préparation\ndu chantier", row: 1 },
+  { pos: 16,   label: "2nd chantier\nparticipatif", row: 0 },
+];
+
+// Charge mensuelle (jours) — null = vide
+const CHARGES = [
+  { pos: 0,    val: "8"   },
+  { pos: 1,    val: "1/2" },
+  { pos: 2,    val: "1,5" },
+  { pos: 3,    val: "2,5" },
+  { pos: 4,    val: "5"   },
+  { pos: 5,    val: "5"   },
+  { pos: 6,    val: "5"   },
+  { pos: 7,    val: "1/2" },
+  { pos: 8,    val: "1"   },
+  { pos: 12,   val: "3"   },
+  { pos: 15,   val: "1/2" },
+  { pos: 16,   val: "1"   },
+];
+
+// Détail textuel (deux colonnes)
+const DETAIL_LEFT = [
+  "Juillet 2026 : formation initiale",
+  "Début septembre : visio en préparation du rêve",
+  "Mi-septembre : animation du rêve à l'école",
+  "Mi-octobre : remise des questionnaires",
+  "Novembre : analyse",
+  "Mi-novembre : temps collectif sur l'Analyse",
+  "Décembre : conception et rendu du design",
+  "Début décembre : temps collectif sur la conception",
+  "Mi-décembre : relecture des designs et visio de REX",
+  "Début janvier 2027 : validation du design par la commune",
+];
+const DETAIL_RIGHT = [
+  "Janvier : rédaction des consignes de préparation du 1er chantier",
+  "Mi-janvier : temps collectif sur la préparation du chantier",
+  "Mi-janvier : relecture des notices et visio de REX",
+  "Mi-Janvier à mars : préparation du chantier par le groupe cœur",
+  "Mars : 1er chantier participatif",
+  "Juin à août : rédaction des consignes du 2nd chantier",
+  "Juin : visio sur la préparation du 2nd chantier",
+  "Septembre à octobre : préparation du 2nd chantier par le groupe cœur",
+  "Novembre : 2nd chantier participatif",
+];
+
+// ── COULEURS catégories ───────────────────────────────
+const CAT_COLORS = {
+  formation: "#c4714a",
+  visio:     "#6a8fa8",
+  tps:       "#c8a97a",
+  relecture: "#5a7a9a",
+  projet:    "#6b7c5c",
+};
+const CAT_LABELS = {
+  formation: "formation initiale",
+  visio:     "visios",
+  tps:       "tps collectifs",
+  relecture: "relecture + visios",
+  projet:    "projet tutoré",
+};
+</script>
+
+<div class="header">
+  <h1>Programme de formation facilitateur·rice</h1>
+  <p><em>Cours du vivant</em> — module Essentiel</p>
+</div>
+
+<!-- Légende -->
+<div class="legende" id="legende"></div>
+
+<!-- Frise -->
+<div class="frise-wrapper">
+  <div class="frise-inner" id="frise"></div>
+</div>
+
+<!-- Détail -->
+<div class="detail" id="detail"></div>
+
+<!-- Titre bas -->
+<div class="footer-title">
+  Programme de formation facilitateur·rice "cours du vivant" – module Essentiel 2026
+</div>
+
+<script>
+// ── HELPERS ───────────────────────────────────────────
+function monthName(idx) {
+  const names = ["juil","août","sept","oct","nov","déc","janv","fév","mars","avr","mai","juin","juil","août","sept","oct","nov","déc"];
+  return names[idx] || "";
+}
+function yearOf(idx) {
+  const d = new Date(START.year, START.month + idx);
+  return d.getFullYear();
+}
+function pct(idx) {
+  return (idx / N_MONTHS * 100).toFixed(4) + "%";
+}
+
+// ── LÉGENDE ───────────────────────────────────────────
+const legende = document.getElementById("legende");
+for (const [key, label] of Object.entries(CAT_LABELS)) {
+  legende.innerHTML += `
+    <div class="legende-item">
+      <div class="legende-dot" style="background:${CAT_COLORS[key]}"></div>
+      <span>${label}</span>
+    </div>`;
+}
+
+// ── FRISE ─────────────────────────────────────────────
+const frise = document.getElementById("frise");
+
+// Structure HTML de la frise
+frise.innerHTML = `
+  <!-- Labels de rangée -->
+  <div style="display:flex; margin-bottom:2px;">
+    <div style="width:120px;flex-shrink:0;"></div>
+    <div style="flex:1;display:flex;flex-direction:column;gap:2px;">
+      <div style="font-family:'Lora',serif;font-size:0.74rem;font-weight:600;color:#7a5c3a;height:22px;display:flex;align-items:center;">Votre projet</div>
+      <div style="font-family:'Lora',serif;font-size:0.74rem;font-weight:600;color:#7a5c3a;height:22px;display:flex;align-items:center;">La formation</div>
+    </div>
+  </div>
+
+  <!-- Événements (labels au-dessus) -->
+  <div style="display:flex;">
+    <div style="width:120px;flex-shrink:0;"></div>
+    <div class="events-area" style="flex:1;position:relative;height:110px;" id="events-area"></div>
+  </div>
+
+  <!-- Frise principale (axe + tracks) -->
+  <div style="display:flex;align-items:stretch;">
+    <div style="width:120px;flex-shrink:0;"></div>
+    <div style="flex:1;position:relative;" id="main-area">
+      <!-- fonds mois alternés -->
+      <div id="month-bgs"></div>
+      <!-- année séparateurs -->
+      <div id="year-seps"></div>
+      <!-- tracks segments -->
+      <div class="tracks-area" id="tracks-area"></div>
+      <!-- axe -->
+      <div class="axe-container">
+        <div class="axe-line"></div>
+        <div class="axe-arrow"></div>
+      </div>
+      <!-- ticks mois -->
+      <div style="position:relative;height:28px;" id="ticks-area"></div>
+    </div>
+  </div>
+
+  <!-- Charge -->
+  <div class="charge-row" style="margin-top:10px;">
+    <div class="charge-label-col">temps de formation,<br>projet, travail<br>personnel évalué (jours)</div>
+    <div class="charge-cells" id="charge-cells" style="flex:1;position:relative;height:22px;"></div>
+  </div>
+`;
+
+// Remplir les fonds mois alternés
+const monthBgs = document.getElementById("month-bgs");
+for (let i = 0; i < N_MONTHS; i++) {
+  if (i % 2 === 0) {
+    const div = document.createElement("div");
+    div.className = "month-bg";
+    div.style.left = pct(i);
+    div.style.width = pct(1);
+    monthBgs.appendChild(div);
+  }
+}
+
+// Séparateurs d'années
+const yearSeps = document.getElementById("year-seps");
+let lastYear = yearOf(0);
+for (let i = 1; i < N_MONTHS; i++) {
+  const y = yearOf(i);
+  if (y !== lastYear) {
+    const sep = document.createElement("div");
+    sep.className = "year-sep";
+    sep.style.left = pct(i);
+    const lbl = document.createElement("div");
+    lbl.className = "year-label";
+    lbl.style.left = pct(i);
+    lbl.textContent = y;
+    yearSeps.appendChild(sep);
+    yearSeps.appendChild(lbl);
+    lastYear = y;
+  }
+}
+// Label première année
+const lbl0 = document.createElement("div");
+lbl0.className = "year-label";
+lbl0.style.left = pct(N_MONTHS * 0.12);
+lbl0.textContent = START.year;
+yearSeps.appendChild(lbl0);
+
+// Ticks + labels mois
+const ticksArea = document.getElementById("ticks-area");
+for (let i = 0; i <= N_MONTHS; i++) {
+  const tick = document.createElement("div");
+  tick.className = "month-tick";
+  tick.style.left = pct(i);
+  ticksArea.appendChild(tick);
+
+  if (i < N_MONTHS) {
+    const lbl = document.createElement("div");
+    lbl.className = "month-label";
+    lbl.style.left = pct(i + 0.5);
+    lbl.textContent = monthName(i);
+    ticksArea.appendChild(lbl);
+  }
+}
+
+// Segments colorés
+const tracksArea = document.getElementById("tracks-area");
+for (const seg of SEGMENTS) {
+  const div = document.createElement("div");
+  div.className = `track-segment track-${seg.track}`;
+  div.style.left   = pct(seg.start);
+  div.style.width  = pct(seg.end - seg.start);
+  div.style.background = CAT_COLORS[seg.type] || "#aaa";
+  tracksArea.appendChild(div);
+}
+
+// Événements
+const eventsArea = document.getElementById("events-area");
+const H = 110;
+for (const ev of EVENTS) {
+  const topBase = ev.row === 0 ? 0 : 30;
+  const lineH   = ev.row === 0 ? 55 : 25;
+
+  const lines = ev.label.split("\n");
+  const linesH = lines.length * 13;
+
+  // label
+  const lbl = document.createElement("div");
+  lbl.className = "event-label";
+  lbl.style.left = pct(ev.pos);
+  lbl.style.top  = topBase + "px";
+  lbl.style.height = linesH + "px";
+  lbl.innerHTML = lines.join("<br>");
+  eventsArea.appendChild(lbl);
+
+  // ligne verticale
+  const line = document.createElement("div");
+  line.className = "event-line";
+  line.style.left   = pct(ev.pos);
+  line.style.bottom = "4px";
+  line.style.height = (H - topBase - linesH - 6) + "px";
+  line.style.color  = "#7a5c3a";
+  line.style.background = "#c8a97a";
+  eventsArea.appendChild(line);
+
+  // dot
+  const dot = document.createElement("div");
+  dot.className = "event-dot";
+  dot.style.left       = pct(ev.pos);
+  dot.style.background = "#7a5c3a";
+  dot.style.bottom     = "0";
+  eventsArea.appendChild(dot);
+}
+
+// Charge mensuelle
+const chargeCells = document.getElementById("charge-cells");
+for (const ch of CHARGES) {
+  const cell = document.createElement("div");
+  cell.className = "charge-cell";
+  cell.style.left = pct(ch.pos + 0.5);
+  cell.textContent = ch.val;
+  chargeCells.appendChild(cell);
+}
+
+// ── DÉTAIL TEXTUEL ────────────────────────────────────
+const detail = document.getElementById("detail");
+const maxLen = Math.max(DETAIL_LEFT.length, DETAIL_RIGHT.length);
+for (let i = 0; i < maxLen; i++) {
+  if (DETAIL_LEFT[i]) {
+    detail.innerHTML += `<div class="detail-item"><span class="detail-bullet">•</span><span>${DETAIL_LEFT[i]}</span></div>`;
+  } else {
+    detail.innerHTML += `<div></div>`;
+  }
+  if (DETAIL_RIGHT[i]) {
+    detail.innerHTML += `<div class="detail-item"><span class="detail-bullet">•</span><span>${DETAIL_RIGHT[i]}</span></div>`;
+  } else {
+    detail.innerHTML += `<div></div>`;
+  }
+}
+detail.innerHTML += `<p class="detail-note">Les dates définitives de l'ensemble de la formation continue seront arrêtées au plus tard lors de la formation de juillet en tenant compte autant que possible des contraintes de chacun.</p>`;
+</script>
+</body>
+</html>
